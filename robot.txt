@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://finance-xi-taupe.vercel.app/sitemap.xml
