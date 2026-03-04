@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FinanceWise — Gestión de Ingresos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --indigo:#6366f1;--violet:#8b5cf6;--emerald:#10b981;
+  --amber:#f59e0b;--rose:#f43f5e;--sky:#38bdf8;
+  --r3:1.75rem;--r2:1.25rem;--r1:1rem;
+  --ease:.3s cubic-bezier(.4,0,.2,1);
+  --ease-slow:.6s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"]{
+  --bg:#030712;--surf:#111827;--surf2:#1f2937;
+  --bord:#1f2937;--bord2:#374151;
+  --txt:#f9fafb;--txt2:#9ca3af;--txt3:#6b7280;
+  --in-bg:#1f2937;--in-bord:#374151;--in-txt:#f9fafb;
+  --shadow:0 20px 40px -12px rgba(0,0,0,.55);
+}
+[data-theme="light"]{
+  --bg:#f1f5f9;--surf:#fff;--surf2:#f8fafc;
+  --bord:#e2e8f0;--bord2:#cbd5e1;
+  --txt:#0f172a;--txt2:#475569;--txt3:#94a3b8;
+  --in-bg:#f1f5f9;--in-bord:#cbd5e1;--in-txt:#0f172a;
+  --shadow:0 20px 40px -12px rgba(0,0,0,.07);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;transition:background var(--ease-slow),color var(--ease-slow)}
+
+/* AMBIENT */
+.amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:0;animation:bIn 1.5s ease forwards}
+.b1{width:600px;height:600px;top:-200px;left:-200px;background:radial-gradient(circle,#6366f128,transparent 70%);animation-delay:.1s}
+.b2{width:500px;height:500px;top:35%;right:-150px;background:radial-gradient(circle,#8b5cf620,transparent 70%);animation-delay:.4s}
+.b3{width:400px;height:400px;bottom:-150px;left:25%;background:radial-gradient(circle,#10b98118,transparent 70%);animation-delay:.7s}
+@keyframes bIn{to{opacity:1}}
+
+.app{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:2rem 1.25rem 4rem}
+
+/* HEADER */
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2.5rem;animation:sD .7s ease both}
+.brand{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem}
+.logo{width:2.2rem;height:2.2rem;border-radius:.65rem;background:linear-gradient(135deg,var(--indigo),var(--violet));display:grid;place-items:center;font-size:.85rem;font-weight:900;color:#fff;box-shadow:0 4px 14px #6366f150}
+.bl{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);font-family:'Syne',sans-serif}
+h1{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,3.5vw,2rem);font-weight:800;color:var(--txt);letter-spacing:-.03em;line-height:1.1}
+.hsub{font-size:.78rem;color:var(--txt3);margin-top:.35rem}
+#tog{width:2.8rem;height:2.8rem;border-radius:var(--r1);border:1px solid var(--bord2);background:var(--surf);font-size:1.1rem;cursor:pointer;display:grid;place-items:center;flex-shrink:0;transition:var(--ease);box-shadow:var(--shadow)}
+#tog:hover{transform:scale(1.1) rotate(15deg);border-color:var(--indigo)}
+
+/* CARD */
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r3);box-shadow:var(--shadow);transition:background var(--ease-slow),border-color var(--ease-slow)}
+
+/* STEP 1 */
+#s1{padding:2rem;animation:fU .7s .1s ease both}
+.fhdr{display:flex;align-items:center;gap:.9rem;margin-bottom:2rem}
+.ficon{width:2.5rem;height:2.5rem;border-radius:.85rem;background:linear-gradient(135deg,var(--indigo),var(--violet));display:grid;place-items:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 4px 14px #6366f140}
+.ftitle{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:var(--txt)}
+.fsub{font-size:.73rem;color:var(--txt3);margin-top:.15rem}
+.fgrid{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:600px){.fgrid{grid-template-columns:1fr 1fr}}
+
+.field label{display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:.5rem}
+.field select,.field input{width:100%;background:var(--in-bg);border:1px solid var(--in-bord);border-radius:var(--r1);color:var(--in-txt);font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.8rem 1rem;outline:none;transition:var(--ease);appearance:none}
+.field select:focus,.field input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px #6366f120}
+.field select option{background:var(--surf);color:var(--txt)}
+.iw{position:relative}
+.ipfx{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);font-size:.95rem;font-weight:700;color:var(--txt3);pointer-events:none;z-index:1}
+.iw input{padding-left:2rem}
+.fnote{font-size:.7rem;color:var(--txt3);margin-top:.4rem}
+
+.icard{border-radius:var(--r1);border:1px solid var(--bord);background:var(--surf2);padding:.9rem 1.1rem}
+.ilabel{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:.3rem}
+.ival{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:var(--txt)}
+.ival span{font-size:.75rem;font-weight:400;color:var(--txt3);margin-left:.35rem}
+.isub{font-size:.68rem;color:var(--txt3);margin-top:.2rem;line-height:1.4}
+
+/* TAX LIVE PREVIEW */
+.tprev{border-radius:var(--r1);border:1px solid var(--bord);background:var(--surf2);padding:1rem 1.25rem}
+.trow{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;padding:.25rem 0}
+.trow .tl{color:var(--txt3)}
+.trow .tv{font-weight:600;color:var(--txt)}
+.trow.neg .tv{color:#f87171}
+.trow.hl .tl{color:var(--txt);font-weight:600}
+.trow.hl .tv{color:var(--emerald);font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800}
+.tdiv{border:none;border-top:1px solid var(--bord2);margin:.5rem 0}
+
+#go{grid-column:1/-1;margin-top:.25rem;width:100%;padding:1rem;border-radius:var(--r1);border:none;background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:var(--ease);box-shadow:0 4px 20px #6366f150}
+#go:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px #6366f170}
+#go:active:not(:disabled){transform:scale(.98)}
+#go:disabled{opacity:.35;cursor:not-allowed}
+
+/* STEP 2 */
+#s2{display:none}
+#s2.vis{display:block}
+.dnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;animation:fU .5s ease both}
+.back{display:flex;align-items:center;gap:.4rem;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--txt3);transition:var(--ease)}
+.back:hover{color:var(--txt);transform:translateX(-3px)}
+.dsub{font-size:.78rem;color:var(--txt3)}
+
+/* STATUS BANNER */
+.sbanner{border-radius:var(--r3);border:1px solid var(--bord);background:var(--surf);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;border-left-width:4px;box-shadow:var(--shadow);animation:fU .5s .05s ease both}
+.sem{font-size:1.75rem;flex-shrink:0}
+.stxt{flex:1;min-width:0}
+.stitle{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--txt)}
+.ssub{font-size:.74rem;color:var(--txt3);margin-top:.2rem}
+.sratio{text-align:right;flex-shrink:0;display:none}
+@media(min-width:580px){.sratio{display:block}}
+.srval{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800}
+.srlbl{font-size:.65rem;color:var(--txt3)}
+
+/* TAX SUMMARY BAR */
+.txbar{padding:1.25rem 1.5rem;display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.25rem;animation:fU .5s .1s ease both}
+@media(min-width:560px){.txbar{grid-template-columns:repeat(4,1fr)}}
+.txcell{text-align:center;padding:.5rem .25rem}
+.txlbl{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);margin-bottom:.35rem}
+.txval{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--txt);word-break:break-all}
+.txval.red{color:#f87171}
+.txval.grn{color:var(--emerald)}
+.txval.amb{color:var(--amber)}
+
+/* TAX DETAIL */
+.txdet{padding:1.1rem 1.4rem;margin-bottom:1.25rem;animation:fU .5s .12s ease both}
+.txdt{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);margin-bottom:.75rem}
+.txdr{display:flex;justify-content:space-between;align-items:baseline;padding:.22rem 0;font-size:.8rem;color:var(--txt2);gap:.5rem}
+.txdr span:first-child{min-width:0;flex:1}
+.txdr span:last-child{flex-shrink:0;font-weight:600}
+.txdr.neg{color:#f87171}
+.txdr.pos{color:var(--emerald);font-weight:700;font-family:'Syne',sans-serif;font-size:.85rem}
+.txdd{border:none;border-top:1px solid var(--bord2);margin:.5rem 0}
+.txdn{font-size:.68rem;color:var(--txt3);margin-top:.6rem;line-height:1.55;padding-top:.5rem;border-top:1px solid var(--bord2)}
+
+/* MAIN GRID */
+.dgrid{display:grid;grid-template-columns:1fr;gap:1.25rem;margin-bottom:1.25rem}
+@media(min-width:740px){.dgrid{grid-template-columns:2fr 1fr}}
+
+.cchart{padding:1.5rem;animation:fU .5s .15s ease both}
+.cchart h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--txt);margin-bottom:.2rem}
+.ccsub{font-size:.7rem;color:var(--txt3);margin-bottom:1.25rem}
+
+/* DONUT — fixed size container */
+.cwrap{
+  position:relative;
+  width:100%;
+  max-width:280px;
+  margin:0 auto;
+  aspect-ratio:1;
+}
+.cwrap canvas{display:block;width:100%!important;height:100%!important}
+
+.cleg{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:1.25rem}
+.cli{display:flex;align-items:center;gap:.5rem;padding:.45rem .6rem;border-radius:.75rem;cursor:default;transition:var(--ease)}
+.cli:hover{background:var(--surf2)}
+.cldot{width:.55rem;height:.55rem;border-radius:50%;flex-shrink:0}
+.clname{font-size:.7rem;color:var(--txt3)}
+.clval{font-size:.78rem;font-weight:600;color:var(--txt)}
+
+/* ASIDE COLUMN */
+.aside-col{display:flex;flex-direction:column;gap:1.25rem;animation:fU .5s .2s ease both}
+.sc{padding:1.4rem}
+.slbl{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:.9rem}
+.si{margin-bottom:.85rem}
+.si:last-child{margin-bottom:0}
+.silbl{font-size:.7rem;color:var(--txt3);margin-bottom:.12rem}
+.siv{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--txt)}
+.siv.lg{font-size:1.5rem}
+.siv.grn{color:var(--emerald)}
+.sdiv{border:none;border-top:1px solid var(--bord);margin:.75rem 0}
+
+.savc{padding:1.4rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;box-shadow:0 8px 25px #6366f145}
+.savl{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:.65rem}
+.savv{font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:#fff}
+.savs{font-size:.73rem;color:rgba(255,255,255,.65);margin-top:.2rem}
+.sava{font-size:.67rem;color:rgba(255,255,255,.4);margin-top:.6rem}
+
+.tipc{padding:1.35rem}
+.tipem{font-size:1.3rem;margin-bottom:.5rem}
+.tipt{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:.35rem}
+.tipx{font-size:.73rem;line-height:1.65;color:var(--txt3)}
+
+/* BARS */
+.bcard{padding:1.5rem;animation:fU .5s .25s ease both;margin-bottom:1.25rem}
+.bcard h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--txt);margin-bottom:.2rem}
+.bcdsub{font-size:.7rem;color:var(--txt3);margin-bottom:1.4rem}
+.brow{display:flex;align-items:center;gap:.9rem;margin-bottom:1rem}
+.brow:last-child{margin-bottom:0}
+.bico{font-size:1.15rem;width:1.7rem;text-align:center;flex-shrink:0}
+.binf{flex:1;min-width:0}
+.bhdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.35rem;gap:.5rem}
+.bname{font-size:.8rem;font-weight:600;color:var(--txt)}
+.bamt{font-size:.8rem;font-weight:700;color:var(--txt);flex-shrink:0}
+.btrk{height:.4rem;background:var(--bord2);border-radius:99px;overflow:hidden}
+.bfll{height:100%;border-radius:99px;width:0;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
+.brem{font-size:.67rem;color:var(--emerald);margin-top:.2rem}
+
+/* DISC */
+.disc{border-radius:var(--r2);border:1px solid var(--bord);background:var(--surf2);padding:.9rem 1.25rem;margin-bottom:1.25rem;font-size:.7rem;color:var(--txt3);line-height:1.6;animation:fU .5s .28s ease both}
+
+/* TIPS */
+.tgrid{display:grid;grid-template-columns:1fr;gap:1rem;animation:fU .5s .3s ease both;margin-bottom:1.25rem}
+@media(min-width:600px){.tgrid{grid-template-columns:repeat(3,1fr)}}
+
+footer{text-align:center;font-size:.68rem;color:var(--txt3);margin-top:2rem}
+
+@keyframes sD{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fU{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bord2);border-radius:99px}
+</style>
+</head>
+<body>
+<div class="amb"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="app">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div>
+    <div class="brand"><div class="logo">₿</div><span class="bl">FinanceWise</span></div>
+    <h1>Gestión de Ingresos</h1>
+    <p class="hsub">Tramos fiscales reales · Costes reales por país · Educación financiera</p>
+  </div>
+  <button id="tog" title="Cambiar tema">☀️</button>
+</header>
+
+<!-- STEP 1: FORM -->
+<div id="s1" class="card">
+  <div class="fhdr">
+    <div class="ficon">🌍</div>
+    <div>
+      <div class="ftitle">Configura tu perfil financiero</div>
+      <div class="fsub">Los cálculos se adaptan al sistema fiscal real de tu país</div>
+    </div>
+  </div>
+  <div class="fgrid">
+
+    <div class="field">
+      <label>País donde trabajas / cobras</label>
+      <select id="sel-origin"><option value="">Selecciona tu país…</option></select>
+    </div>
+
+    <div class="field">
+      <label>País donde vives actualmente</label>
+      <select id="sel-res"><option value="">¿Dónde resides?</option></select>
+    </div>
+
+    <div class="field" id="c-minwage" style="display:none">
+      <div class="icard">
+        <div class="ilabel">Salario mínimo detectado</div>
+        <div class="ival" id="minwage-val">—</div>
+        <div class="isub" id="minwage-usd">—</div>
+      </div>
+    </div>
+
+    <div class="field" id="c-taxinfo" style="display:none">
+      <div class="icard">
+        <div class="ilabel">⚖️ Sistema fiscal</div>
+        <div class="ival" id="taxinfo-val">—</div>
+        <div class="isub" id="taxinfo-sub">—</div>
+      </div>
+    </div>
+
+    <div class="field" style="grid-column:1/-1">
+      <label id="inc-lbl">Salario bruto mensual</label>
+      <div class="iw">
+        <span class="ipfx" id="sym-pfx">$</span>
+        <input type="number" id="inc-input" placeholder="Ej: 2500" min="0" step="any"/>
+      </div>
+      <div class="fnote" id="conv-note" style="display:none"></div>
+    </div>
+
+    <div class="field" id="c-taxlive" style="display:none;grid-column:1/-1">
+      <div class="tprev">
+        <div class="ilabel">📊 Desglose fiscal en tiempo real</div>
+        <div class="trow"><span class="tl">Salario bruto</span><span class="tv" id="tp-bruto">—</span></div>
+        <div class="trow neg"><span class="tl" id="tp-irpf-lbl">IRPF / Impuesto renta</span><span class="tv" id="tp-irpf">—</span></div>
+        <div class="trow neg"><span class="tl" id="tp-ss-lbl">Seguridad Social / Aportes</span><span class="tv" id="tp-ss">—</span></div>
+        <hr class="tdiv"/>
+        <div class="trow hl"><span class="tl">💵 Salario neto mensual</span><span class="tv" id="tp-neto">—</span></div>
+      </div>
+    </div>
+
+    <button id="go" disabled>Analizar mis finanzas →</button>
+  </div>
+</div>
+
+<!-- STEP 2: DASHBOARD -->
+<div id="s2">
+  <div class="dnav">
+    <button class="back" id="btn-back">← Editar perfil</button>
+    <span class="dsub" id="dash-sub"></span>
+  </div>
+
+  <div class="sbanner" id="s-banner">
+    <span class="sem" id="s-em">💡</span>
+    <div class="stxt">
+      <div class="stitle" id="s-title">—</div>
+      <div class="ssub" id="s-sub">—</div>
+    </div>
+    <div class="sratio">
+      <div class="srval" id="s-ratio">—</div>
+      <div class="srlbl">vs. salario mínimo</div>
+    </div>
+  </div>
+
+  <div class="card txbar">
+    <div class="txcell"><div class="txlbl">Bruto mensual</div><div class="txval amb" id="tx-bruto">—</div></div>
+    <div class="txcell"><div class="txlbl">Impuestos</div><div class="txval red" id="tx-imp">—</div></div>
+    <div class="txcell"><div class="txlbl">Neto mensual</div><div class="txval grn" id="tx-neto">—</div></div>
+    <div class="txcell"><div class="txlbl">Neto anual</div><div class="txval" id="tx-annual">—</div></div>
+  </div>
+
+  <div class="card txdet">
+    <div class="txdt">📋 Detalle impuestos — <span id="txd-cntry"></span></div>
+    <div id="txd-rows"></div>
+    <hr class="txdd"/>
+    <div class="txdr pos"><span>Salario neto final</span><span id="txd-neto">—</span></div>
+    <div class="txdn" id="txd-note"></div>
+  </div>
+
+  <div class="dgrid">
+    <!-- CHART -->
+    <div class="card cchart">
+      <h3>Distribución estimada del gasto</h3>
+      <p class="ccsub" id="chart-sub">Costes medios reales en tu país de residencia</p>
+      <div class="cwrap"><canvas id="donut"></canvas></div>
+      <div class="cleg" id="c-leg"></div>
+    </div>
+
+    <!-- ASIDE -->
+    <div class="aside-col">
+      <div class="card sc">
+        <div class="slbl">Resumen económico</div>
+        <div class="si">
+          <div class="silbl">Salario bruto mensual</div>
+          <div class="siv" id="sum-bruto">—</div>
+        </div>
+        <div class="si">
+          <div class="silbl">Salario neto mensual</div>
+          <div class="siv lg grn" id="sum-neto">—</div>
+        </div>
+        <hr class="sdiv"/>
+        <div class="si" id="cross-item" style="display:none">
+          <div class="silbl" id="cross-lbl">En moneda de residencia</div>
+          <div class="siv" id="sum-cross">—</div>
+        </div>
+        <hr class="sdiv" id="cross-div" style="display:none"/>
+        <div class="si">
+          <div class="silbl">Equivalente en USD</div>
+          <div class="siv" id="sum-usd">—</div>
+        </div>
+      </div>
+
+      <div class="card savc">
+        <div class="savl">💰 Capacidad de ahorro</div>
+        <div class="savv" id="sav-val">—</div>
+        <div class="savs" id="sav-pct">—</div>
+        <div class="sava" id="sav-annual">—</div>
+      </div>
+
+      <div class="card tipc">
+        <div class="tipem" id="tip-em">💡</div>
+        <div class="tipt" id="tip-t">—</div>
+        <div class="tipx" id="tip-x">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bcard">
+    <h3>Desglose de gastos — valores reales</h3>
+    <p class="bcdsub" id="bars-sub">—</p>
+    <div id="bars"></div>
+  </div>
+
+  <div class="disc">
+    ℹ️ <strong>Nota:</strong> Impuestos calculados con tramos progresivos reales 2024–2025.
+    Los gastos son medias estadísticas nacionales (Eurostat, INE, DANE, IBGE…).
+    La situación real varía según ciudad, tipo de vivienda y estilo de vida.
+  </div>
+
+  <div class="tgrid" id="tips"></div>
+</div>
+
+<footer>Datos orientativos · Tramos fiscales reales 2024-2025 · FinanceWise © 2026</footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   COUNTRY DATA
+   taxBrackets: tramos MARGINALES (se aplica solo al exceso de cada tramo)
+   ssRate: cotización empleado (tasa plana sobre bruto)
+   costs: gastos medios MENSUALES absolutos reales en moneda local
+══════════════════════════════════════════════════════════ */
+const COUNTRIES = {
+
+  ES: {
+    name:"España", currency:"EUR", symbol:"€", minWage:1134,
+    taxNote:"IRPF 2024: tramos marginales estatales + autonómicos (media). Mínimo personal exento 5.550€/año. SS trabajador: desempleo 1,55% + formación 0,10% + FOGASA 0,20% = 1,85%... pero la cotización total del trabajador es ~6,35% (contingencias comunes 4,7% + desempleo 1,55% + fp 0,10%).",
+    // Tramos MARGINALES conjuntos (estatal + autonómico media España) 2024
+    // Base liquidable tras mínimo personal 5.550€/año
+    personalAllowanceAnnual: 5550,
+    taxBrackets:[
+      {from:0,      to:12450,   rate:0.19},
+      {from:12450,  to:20200,   rate:0.24},
+      {from:20200,  to:35200,   rate:0.30},
+      {from:35200,  to:60000,   rate:0.37},
+      {from:60000,  to:300000,  rate:0.45},
+      {from:300000, to:Infinity,rate:0.47},
+    ],
+    ssRate:0.0635,
+    costs:{ vivienda:700, alimentacion:300, transporte:130, servicios:110, ocio:150, otros:160 },
+  },
+
+  DE: {
+    name:"Alemania", currency:"EUR", symbol:"€", minWage:2054,
+    taxNote:"Einkommensteuer 2024. Grundfreibetrag (exento) 11.604€/año. + Solidaritätszuschlag abolido para rentas medias. SS: Krankenversicherung 7,3% + Pflegeversicherung 1,7% + Rentenversicherung 9,3% + Arbeitslosenversicherung 1,3% ≈ 19,6% empleado.",
+    personalAllowanceAnnual:11604,
+    taxBrackets:[
+      {from:0,      to:15999,   rate:0.14},
+      {from:15999,  to:62809,   rate:0.24},
+      {from:62809,  to:277825,  rate:0.42},
+      {from:277825, to:Infinity,rate:0.45},
+    ],
+    ssRate:0.196,
+    costs:{ vivienda:950, alimentacion:330, transporte:220, servicios:190, ocio:200, otros:190 },
+  },
+
+  FR: {
+    name:"Francia", currency:"EUR", symbol:"€", minWage:1767,
+    taxNote:"Impôt sur le revenu 2024. Abatement forfaitaire 10% sobre salario (min 448€, max 13.522€). Cotisations salariales: assurance maladie 0,75% + retraite complémentaire ~4% + chômage 0% (desde 2018) + CSG/CRDS 9,7% ≈ 22% total.",
+    personalAllowanceAnnual:0, // se calcula vía abatement
+    abatementRate:0.10, abatementMin:448, abatementMax:13522,
+    taxBrackets:[
+      {from:0,      to:11294,   rate:0},
+      {from:11294,  to:28797,   rate:0.11},
+      {from:28797,  to:82341,   rate:0.30},
+      {from:82341,  to:177106,  rate:0.41},
+      {from:177106, to:Infinity,rate:0.45},
+    ],
+    ssRate:0.22,
+    costs:{ vivienda:800, alimentacion:350, transporte:180, servicios:160, ocio:200, otros:175 },
+  },
+
+  IT: {
+    name:"Italia", currency:"EUR", symbol:"€", minWage:1000,
+    taxNote:"IRPEF 2024 (riforma): tramos 23% hasta 28k, 35% hasta 50k, 43% más. Detrazioni da lavoro dipendente reducen cuota. INPS: IVS 9,19% + Fondo Garanzia 0,20% ≈ 9,39%.",
+    personalAllowanceAnnual:0,
+    taxBrackets:[
+      {from:0,      to:28000,   rate:0.23},
+      {from:28000,  to:50000,   rate:0.35},
+      {from:50000,  to:Infinity,rate:0.43},
+    ],
+    ssRate:0.0939,
+    // Detrazione media por lavoro dipendente (reduce cuota, no base)
+    laborDeductionMonthly: 80, // aprox €80/mes para salarios medios
+    costs:{ vivienda:700, alimentacion:320, transporte:170, servicios:150, ocio:175, otros:155 },
+  },
+
+  PT: {
+    name:"Portugal", currency:"EUR", symbol:"€", minWage:820,
+    taxNote:"IRS 2024: escalões marginais. Segurança Social trabalhador 11%.",
+    personalAllowanceAnnual:0,
+    taxBrackets:[
+      {from:0,      to:7703,    rate:0.1325},
+      {from:7703,   to:11623,   rate:0.18},
+      {from:11623,  to:16472,   rate:0.23},
+      {from:16472,  to:21321,   rate:0.26},
+      {from:21321,  to:27146,   rate:0.3288},
+      {from:27146,  to:39791,   rate:0.37},
+      {from:39791,  to:51997,   rate:0.435},
+      {from:51997,  to:81199,   rate:0.45},
+      {from:81199,  to:Infinity,rate:0.48},
+    ],
+    ssRate:0.11,
+    costs:{ vivienda:650, alimentacion:260, transporte:120, servicios:105, ocio:140, otros:125 },
+  },
+
+  GB: {
+    name:"Reino Unido", currency:"GBP", symbol:"£", minWage:1939,
+    taxNote:"Income Tax 2024/25. Personal Allowance £12.570/año. Basic Rate 20% hasta £50.270, Higher Rate 40% hasta £125.140, Additional Rate 45%. NI Clase 1: 8% sobre £12.570-50.270, 2% por encima.",
+    personalAllowanceAnnual:12570,
+    taxBrackets:[
+      {from:0,      to:50270,   rate:0.20},
+      {from:50270,  to:125140,  rate:0.40},
+      {from:125140, to:Infinity,rate:0.45},
+    ],
+    ssRate:0.08, // NI principal rate (simplificado; encima de 50.270 es 2%)
+    costs:{ vivienda:950, alimentacion:290, transporte:230, servicios:200, ocio:220, otros:200 },
+  },
+
+  US: {
+    name:"EE.UU.", currency:"USD", symbol:"$", minWage:1256,
+    taxNote:"Federal Income Tax 2024 + State tax medio estimado 5% + FICA: Social Security 6,2% (hasta $168.600/año) + Medicare 1,45%. Standard deduction individual: $14.600/año.",
+    personalAllowanceAnnual:14600,
+    taxBrackets:[
+      {from:0,      to:11600,   rate:0.10},
+      {from:11600,  to:47150,   rate:0.12},
+      {from:47150,  to:100525,  rate:0.22},
+      {from:100525, to:191950,  rate:0.24},
+      {from:191950, to:243725,  rate:0.32},
+      {from:243725, to:609350,  rate:0.35},
+      {from:609350, to:Infinity,rate:0.37},
+    ],
+    ssRate:0.0765, // FICA
+    stateTaxRate:0.05,
+    costs:{ vivienda:1400, alimentacion:420, transporte:580, servicios:250, ocio:310, otros:280 },
+  },
+
+  CA: {
+    name:"Canadá", currency:"CAD", symbol:"CA$", minWage:2260,
+    taxNote:"Federal Tax 2024 + Ontario Provincial (media). Basic Personal Amount federal $15.705/año. CPP 5,95% + EI 1,66%.",
+    personalAllowanceAnnual:15705,
+    taxBrackets:[
+      {from:0,      to:55867,   rate:0.15},
+      {from:55867,  to:111733,  rate:0.205},
+      {from:111733, to:154906,  rate:0.26},
+      {from:154906, to:220000,  rate:0.29},
+      {from:220000, to:Infinity,rate:0.33},
+    ],
+    ssRate:0.0761,
+    costs:{ vivienda:1600, alimentacion:460, transporte:410, servicios:200, ocio:280, otros:250 },
+  },
+
+  AU: {
+    name:"Australia", currency:"AUD", symbol:"AU$", minWage:3380,
+    taxNote:"Income Tax 2024-25. Tax-free threshold $18.200/año. + Medicare Levy 2%. Superannuation (11% empleador, no descuento empleado).",
+    personalAllowanceAnnual:18200,
+    taxBrackets:[
+      {from:0,      to:45000,   rate:0.19},
+      {from:45000,  to:120000,  rate:0.325},
+      {from:120000, to:180000,  rate:0.37},
+      {from:180000, to:Infinity,rate:0.45},
+    ],
+    ssRate:0.02, // Medicare Levy
+    costs:{ vivienda:1750, alimentacion:520, transporte:420, servicios:260, ocio:330, otros:290 },
+  },
+
+  JP: {
+    name:"Japón", currency:"JPY", symbol:"¥", minWage:236000,
+    taxNote:"所得税 2024 + 住民税 10% (impuesto municipal). Exento básico ¥480.000. SS: 健康保険 5% + 厚生年金 9,15% + 雇用保険 0,6% ≈ 14,75%.",
+    personalAllowanceAnnual:480000,
+    taxBrackets:[
+      {from:0,        to:1950000,  rate:0.05},
+      {from:1950000,  to:3300000,  rate:0.10},
+      {from:3300000,  to:6950000,  rate:0.20},
+      {from:6950000,  to:9000000,  rate:0.23},
+      {from:9000000,  to:18000000, rate:0.33},
+      {from:18000000, to:40000000, rate:0.40},
+      {from:40000000, to:Infinity, rate:0.45},
+    ],
+    municipalTaxRate:0.10,
+    ssRate:0.1475,
+    costs:{ vivienda:65000, alimentacion:36000, transporte:13000, servicios:16000, ocio:18000, otros:15000 },
+  },
+
+  MX: {
+    name:"México", currency:"MXN", symbol:"$", minWage:2784,
+    taxNote:"ISR 2024 tabela mensual progresiva. Cuotas IMSS empleado: enfermedad/maternidad 0,4% + pensión 1,125% + retiro 0% + cesantía+vejez 1,125% ≈ 2,5% (+subsidio por empleo reduce cuota en salarios bajos).",
+    personalAllowanceAnnual:0,
+    taxBrackets:[
+      // Tramos anuales ISR México 2024
+      {from:0,         to:8952.49*12,   rate:0.0192},
+      {from:8952.49*12,to:75984.55*12,  rate:0.064},
+      {from:75984.55*12,to:89652.48*12, rate:0.1088},
+      {from:89652.48*12,to:104174.4*12, rate:0.16},
+      {from:104174.4*12,to:124883.28*12,rate:0.1792},
+      {from:124883.28*12,to:249166.56*12,rate:0.2136},
+      {from:249166.56*12,to:392841.96*12,rate:0.2352},
+      {from:392841.96*12,to:750000*12,   rate:0.30},
+      {from:750000*12,  to:Infinity,     rate:0.35},
+    ],
+    ssRate:0.025,
+    costs:{ vivienda:5500, alimentacion:3800, transporte:1400, servicios:950, ocio:1300, otros:1100 },
+  },
+
+  BR: {
+    name:"Brasil", currency:"BRL", symbol:"R$", minWage:1412,
+    taxNote:"IRPF 2024: tabela progressiva. INSS empregado: alíquotas progressivas sobre salário (7,5% até 1.412, 9% até 2.666,68, 12% até 4.000,03, 14% até 7.786,02).",
+    personalAllowanceAnnual:0,
+    taxBrackets:[
+      {from:0,       to:2259.20*12, rate:0},
+      {from:2259.20*12,to:2826.65*12,rate:0.075},
+      {from:2826.65*12,to:3751.05*12,rate:0.15},
+      {from:3751.05*12,to:4664.68*12,rate:0.225},
+      {from:4664.68*12,to:Infinity,  rate:0.275},
+    ],
+    ssRate:0.09,
+    costs:{ vivienda:1200, alimentacion:880, transporte:390, servicios:340, ocio:290, otros:260 },
+  },
+
+  AR: {
+    name:"Argentina", currency:"ARS", symbol:"$", minWage:234315,
+    taxNote:"Ganancias 4ª cat. 2024 (actualizado). Mínimo no imponible +  deducción especial. SS: jubilación 11% + obra social 3% + ANSSAL 0,5% + desempleo 0,5% = 15%.",
+    personalAllowanceAnnual:2340000,  // MNI + deducción especial aprox 2024
+    taxBrackets:[
+      {from:0,         to:419739*12,   rate:0.05},
+      {from:419739*12, to:839478*12,   rate:0.09},
+      {from:839478*12, to:1258988*12,  rate:0.12},
+      {from:1258988*12,to:1678650*12,  rate:0.15},
+      {from:1678650*12,to:2518163*12,  rate:0.19},
+      {from:2518163*12,to:3357217*12,  rate:0.23},
+      {from:3357217*12,to:5035325*12,  rate:0.27},
+      {from:5035325*12,to:Infinity,    rate:0.35},
+    ],
+    ssRate:0.15,
+    costs:{ vivienda:180000, alimentacion:130000, transporte:38000, servicios:45000, ocio:35000, otros:32000 },
+  },
+
+  CL: {
+    name:"Chile", currency:"CLP", symbol:"$", minWage:500000,
+    taxNote:"Impuesto 2ª categoría 2024. AFP: 10% + comisión ~0,77%. Fonasa: 7%. Seguro cesantía: 0,6%. SS total empleado ≈ 18,37%.",
+    personalAllowanceAnnual:0,
+    taxBrackets:[
+      {from:0,         to:685869*12,   rate:0},
+      {from:685869*12, to:1523042*12,  rate:0.04},
+      {from:1523042*12,to:2538403*12,  rate:0.08},
+      {from:2538403*12,to:3553764*12,  rate:0.135},
+      {from:3553764*12,to:4569125*12,  rate:0.23},
+      {from:4569125*12,to:6091500*12,  rate:0.304},
+      {from:6091500*12,to:Infinity,    rate:0.35},
+    ],
+    ssRate:0.1837,
+    costs:{ vivienda:350000, alimentacion:195000, transporte:88000, servicios:68000, ocio:78000, otros:68000 },
+  },
+
+  CO: {
+    name:"Colombia", currency:"COP", symbol:"$", minWage:1300000,
+    taxNote:"Renta cedular 2024 (rentas de trabajo). Umbral exento: 1090 UVT/año (~$51,4M). SS empleado: salud 4% + pensión 4% = 8%.",
+    personalAllowanceAnnual:51400000,
+    taxBrackets:[
+      {from:0,          to:48312000,   rate:0.19},
+      {from:48312000,   to:72468000,   rate:0.28},
+      {from:72468000,   to:96624000,   rate:0.33},
+      {from:96624000,   to:Infinity,   rate:0.39},
+    ],
+    ssRate:0.08,
+    costs:{ vivienda:900000, alimentacion:730000, transporte:290000, servicios:195000, ocio:240000, otros:195000 },
+  },
+
+  PE: {
+    name:"Perú", currency:"PEN", symbol:"S/.", minWage:1025,
+    taxNote:"Impuesto a la Renta 5ª cat. 2024 (en UIT 5.150 S/.). Exento 7 UIT/año (36.050 S/.). ONP 13% o AFP ~10% (usamos 13% ONP).",
+    personalAllowanceAnnual:36050,
+    taxBrackets:[
+      {from:0,       to:25750,   rate:0.08},
+      {from:25750,   to:103000,  rate:0.14},
+      {from:103000,  to:206000,  rate:0.17},
+      {from:206000,  to:412000,  rate:0.20},
+      {from:412000,  to:Infinity,rate:0.30},
+    ],
+    ssRate:0.13,
+    costs:{ vivienda:700, alimentacion:580, transporte:195, servicios:145, ocio:140, otros:140 },
+  },
+
+  UY: {
+    name:"Uruguay", currency:"UYU", symbol:"$U", minWage:22268,
+    taxNote:"IRPF 2024: tramos sobre ingreso nominal. BPS: jubilación 15% + FRL 0,125% + FONASA 3%-8% según nivel. Total SS ≈ 18-23%.",
+    personalAllowanceAnnual:0,
+    taxBrackets:[
+      {from:0,       to:22916*12,  rate:0},
+      {from:22916*12,to:32737*12,  rate:0.10},
+      {from:32737*12,to:49106*12,  rate:0.15},
+      {from:49106*12,to:98213*12,  rate:0.24},
+      {from:98213*12,to:196425*12, rate:0.25},
+      {from:196425*12,to:294638*12,rate:0.27},
+      {from:294638*12,to:Infinity, rate:0.31},
+    ],
+    ssRate:0.19,
+    costs:{ vivienda:15000, alimentacion:9800, transporte:3400, servicios:2900, ocio:3800, otros:3300 },
+  },
+
+  EC: {
+    name:"Ecuador", currency:"USD", symbol:"$", minWage:460,
+    taxNote:"IR empleados 2024. Exento: $11.722/año. IESS personal: 9,45%.",
+    personalAllowanceAnnual:11722,
+    taxBrackets:[
+      {from:0,      to:3208,    rate:0.05},
+      {from:3208,   to:8008,    rate:0.10},
+      {from:8008,   to:13838,   rate:0.12},
+      {from:13838,  to:21726,   rate:0.15},
+      {from:21726,  to:31757,   rate:0.20},
+      {from:31757,  to:43957,   rate:0.25},
+      {from:43957,  to:59491,   rate:0.30},
+      {from:59491,  to:Infinity,rate:0.35},
+    ],
+    ssRate:0.0945,
+    costs:{ vivienda:300, alimentacion:240, transporte:78, servicios:75, ocio:75, otros:75 },
+  },
+};
+
+const USD_RATES = {
+  EUR:1.085, GBP:1.27, USD:1, CAD:0.735, AUD:0.649,
+  JPY:0.0067, MXN:0.058, BRL:0.198, ARS:0.00107,
+  CLP:0.00109, COP:0.00025, PEN:0.267, UYU:0.025,
+};
+
+const CATS = [
+  {key:"vivienda",     label:"Vivienda",     icon:"🏠", color:"#6366f1"},
+  {key:"alimentacion", label:"Alimentación", icon:"🍽️", color:"#f59e0b"},
+  {key:"transporte",   label:"Transporte",   icon:"🚗", color:"#10b981"},
+  {key:"servicios",    label:"Servicios",    icon:"⚡", color:"#38bdf8"},
+  {key:"ocio",         label:"Ocio",         icon:"🎉", color:"#ec4899"},
+  {key:"otros",        label:"Varios",       icon:"📦", color:"#64748b"},
+  {key:"ahorro",       label:"Ahorro",       icon:"💰", color:"#8b5cf6"},
+];
+
+/* ═══════════════════════════════════════════════════════
+   TAX CALCULATION — tramos marginales correctos
+   El tramo se aplica SOLO al exceso dentro de ese tramo,
+   no sobre el total del salario.
+══════════════════════════════════════════════════════════ */
+function calcTax(grossMonthly, cd) {
+  const grossAnnual = grossMonthly * 12;
+
+  // 1) Base imponible tras exenciones/mínimo personal
+  let taxableBase = grossAnnual;
+
+  // Deducción/exención anual base (mínimo personal, standard deduction, etc.)
+  if (cd.personalAllowanceAnnual) {
+    taxableBase = Math.max(0, grossAnnual - cd.personalAllowanceAnnual);
+  }
+
+  // Abatement francés (10% sobre salario bruto)
+  if (cd.abatementRate) {
+    const ab = Math.min(Math.max(grossAnnual * cd.abatementRate, cd.abatementMin), cd.abatementMax);
+    taxableBase = Math.max(0, grossAnnual - ab);
+  }
+
+  // 2) IRPF / Income Tax — tramos MARGINALES
+  let irpfAnnual = 0;
+  for (let i = 0; i < cd.taxBrackets.length; i++) {
+    const b = cd.taxBrackets[i];
+    if (taxableBase <= b.from) break;
+    const tramo = Math.min(taxableBase, b.to) - b.from;
+    irpfAnnual += tramo * b.rate;
+  }
+
+  // Impuesto municipal (Japón)
+  if (cd.municipalTaxRate) {
+    irpfAnnual += taxableBase * cd.municipalTaxRate;
+  }
+
+  // State tax adicional (EE.UU.)
+  if (cd.stateTaxRate) {
+    irpfAnnual += taxableBase * cd.stateTaxRate;
+  }
+
+  // Detrazioni Italia (reducción directa en cuota)
+  const irpfMonthly = irpfAnnual / 12 - (cd.laborDeductionMonthly || 0);
+  const irpfMonthlyFinal = Math.max(0, irpfMonthly);
+
+  // 3) Seguridad Social — tasa plana sobre bruto
+  const ssMonthly = grossMonthly * cd.ssRate;
+
+  // 4) Neto
+  const totalMonthly  = irpfMonthlyFinal + ssMonthly;
+  const netoMonthly   = Math.max(0, grossMonthly - totalMonthly);
+  const irpfPct       = grossMonthly > 0 ? (irpfMonthlyFinal / grossMonthly * 100).toFixed(1) : "0.0";
+  const ssPct         = (cd.ssRate * 100).toFixed(2);
+  const totalPct      = grossMonthly > 0 ? (totalMonthly / grossMonthly * 100).toFixed(1) : "0.0";
+
+  return { grossMonthly, irpfMonthly:irpfMonthlyFinal, ssMonthly, totalMonthly, netoMonthly, irpfPct, ssPct, totalPct };
+}
+
+/* ═══════════════════════════════════════════════════════
+   DISTRIBUTION — costes absolutos + ahorro como resto
+══════════════════════════════════════════════════════════ */
+function getDist(neto, cd) {
+  const base = cd.costs;
+  const totalCosts = Object.values(base).reduce((a, b) => a + b, 0);
+  let scale = 1;
+  // Si los costes superan el 92% del neto, escalar proporcionalmente
+  if (totalCosts > neto * 0.92 && neto > 0) {
+    scale = (neto * 0.88) / totalCosts;
+  }
+  const items = CATS.filter(c => c.key !== "ahorro").map(c => ({
+    ...c,
+    value: Math.round((base[c.key] || 0) * scale),
+    scaled: scale < 1,
+  }));
+  const usedTotal = items.reduce((a, b) => a + b.value, 0);
+  const ahorro = Math.max(0, neto - usedTotal);
+  items.push({ ...CATS.find(c => c.key === "ahorro"), value: ahorro, scaled: false });
+  return items;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GLOBALS
+══════════════════════════════════════════════════════════ */
+let chartInst = null, oData = null, rData = null;
+
+function fmt(v, sym) {
+  if (isNaN(v) || v === null) return (sym||"$") + "—";
+  return (sym||"$") + Math.round(v).toLocaleString("es-ES");
+}
+
+/* ═══════════════════════════════════════════════════════
+   POPULATE SELECTS
+══════════════════════════════════════════════════════════ */
+function populateSelects() {
+  const sorted = Object.entries(COUNTRIES).sort((a, b) => a[1].name.localeCompare(b[1].name, "es"));
+  ["sel-origin", "sel-res"].forEach(id => {
+    const sel = document.getElementById(id);
+    sorted.forEach(([code, c]) => {
+      const o = document.createElement("option");
+      o.value = code;
+      o.textContent = `${c.name} — ${c.currency}`;
+      sel.appendChild(o);
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   FORM LOGIC
+══════════════════════════════════════════════════════════ */
+function onOrigin() {
+  const code = document.getElementById("sel-origin").value;
+  oData = COUNTRIES[code] || null;
+  if (oData) {
+    document.getElementById("minwage-val").innerHTML =
+      `${fmt(oData.minWage, oData.symbol)} <span>${oData.currency}/mes</span>`;
+    document.getElementById("minwage-usd").textContent =
+      `≈ $${Math.round(oData.minWage * (USD_RATES[oData.currency] || 1)).toLocaleString()} USD`;
+    document.getElementById("c-minwage").style.display = "block";
+    document.getElementById("taxinfo-val").innerHTML =
+      `SS: ${(oData.ssRate*100).toFixed(1)}% + <span>IRPF progresivo</span>`;
+    document.getElementById("taxinfo-sub").textContent = oData.taxNote.substring(0, 90) + "…";
+    document.getElementById("c-taxinfo").style.display = "block";
+    document.getElementById("inc-lbl").textContent = `Salario bruto mensual (${oData.currency})`;
+    document.getElementById("sym-pfx").textContent = oData.symbol;
+    document.getElementById("tp-ss-lbl").textContent =
+      `Seg. Social / Aportes (${(oData.ssRate*100).toFixed(2)}%)`;
+  } else {
+    ["c-minwage","c-taxinfo","c-taxlive"].forEach(id =>
+      document.getElementById(id).style.display = "none");
+    document.getElementById("inc-lbl").textContent = "Salario bruto mensual";
+    document.getElementById("sym-pfx").textContent = "$";
+  }
+  refreshTaxLive();
+  refreshConvNote();
+  refreshBtn();
+}
+
+function onRes() {
+  rData = COUNTRIES[document.getElementById("sel-res").value] || null;
+  refreshConvNote();
+  refreshBtn();
+}
+
+function refreshTaxLive() {
+  const gross = parseFloat(document.getElementById("inc-input").value) || 0;
+  const card = document.getElementById("c-taxlive");
+  if (!oData || gross <= 0) { card.style.display = "none"; return; }
+  const t = calcTax(gross, oData);
+  const s = oData.symbol;
+  document.getElementById("tp-bruto").textContent = fmt(t.grossMonthly, s);
+  document.getElementById("tp-irpf").textContent  = `- ${fmt(t.irpfMonthly, s)}  (${t.irpfPct}%)`;
+  document.getElementById("tp-ss").textContent    = `- ${fmt(t.ssMonthly, s)}  (${t.ssPct}%)`;
+  document.getElementById("tp-neto").textContent  = fmt(t.netoMonthly, s);
+  card.style.display = "block";
+}
+
+function refreshConvNote() {
+  const note = document.getElementById("conv-note");
+  const gross = parseFloat(document.getElementById("inc-input").value) || 0;
+  if (oData && rData && oData.currency !== rData.currency && gross > 0) {
+    const t = calcTax(gross, oData);
+    const inUSD = t.netoMonthly * (USD_RATES[oData.currency] || 1);
+    const inRes = inUSD / (USD_RATES[rData.currency] || 1);
+    note.textContent = `Neto ≈ ${fmt(Math.round(inRes), rData.symbol)} ${rData.currency} (tipo de cambio estimado)`;
+    note.style.display = "block";
+  } else {
+    note.style.display = "none";
+  }
+}
+
+function refreshBtn() {
+  const gross = parseFloat(document.getElementById("inc-input").value) || 0;
+  document.getElementById("go").disabled = !(oData && rData && gross > 0);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CHART — usa el mismo array dist en chart y leyenda
+══════════════════════════════════════════════════════════ */
+function buildChart(dist) {
+  const ctx = document.getElementById("donut").getContext("2d");
+  const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
+
+  // Solo segmentos con valor > 0
+  const visible = dist.filter(d => d.value > 0);
+  if (visible.length === 0) return;
+
+  chartInst = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: visible.map(d => d.label),
+      datasets: [{
+        data: visible.map(d => d.value),
+        backgroundColor: visible.map(d => d.color),
+        borderColor: dark ? "#111827" : "#ffffff",
+        borderWidth: 3,
+        hoverBorderWidth: 0,
+        hoverOffset: 10,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: "62%",
+      layout: { padding: 8 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: dark ? "#1e293b" : "#ffffff",
+          borderColor: dark ? "#334155" : "#e2e8f0",
+          borderWidth: 1,
+          titleColor: dark ? "#f1f5f9" : "#0f172a",
+          bodyColor: dark ? "#94a3b8" : "#475569",
+          titleFont: { family: "Syne", weight: "700", size: 13 },
+          bodyFont: { family: "DM Sans", size: 12 },
+          padding: 12,
+          callbacks: {
+            title: items => visible[items[0].dataIndex].label,
+            label: item => {
+              const d = visible[item.dataIndex];
+              const total = visible.reduce((a, b) => a + b.value, 0);
+              const pct = total > 0 ? Math.round(d.value / total * 100) : 0;
+              return `  ${pct}%  ·  ${fmt(d.value, oData?.symbol)}`;
+            }
+          }
+        }
+      },
+      animation: { animateRotate: true, duration: 800, easing: "easeInOutQuart" },
+    }
+  });
+}
+
+function buildLegend(dist) {
+  const visible = dist.filter(d => d.value > 0);
+  const total = visible.reduce((a, b) => a + b.value, 0);
+  document.getElementById("c-leg").innerHTML = visible.map(d => {
+    const pct = total > 0 ? Math.round(d.value / total * 100) : 0;
+    return `<div class="cli">
+      <div class="cldot" style="background:${d.color}"></div>
+      <div>
+        <div class="clname">${d.icon} ${d.label} <span style="opacity:.6">${pct}%</span></div>
+        <div class="clval">${fmt(d.value, oData?.symbol)}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function buildBars(dist, neto) {
+  document.getElementById("bars").innerHTML = dist.map(d => {
+    const pct = neto > 0 ? Math.round(d.value / neto * 100) : 0;
+    const barW = Math.min(pct, 100);
+    return `<div class="brow">
+      <span class="bico">${d.icon}</span>
+      <div class="binf">
+        <div class="bhdr">
+          <span class="bname">${d.label}${d.scaled ? " ⚡" : ""}</span>
+          <span class="bamt">${fmt(d.value, oData?.symbol)}</span>
+        </div>
+        <div class="btrk">
+          <div class="bfll" data-w="${barW}" style="background:${d.color}"></div>
+        </div>
+        ${d.key === "ahorro" && d.value > 0 ? `<div class="brem">✓ Ahorro disponible (${pct}% del neto)</div>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+  // Trigger transition
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.querySelectorAll(".bfll").forEach(b => { b.style.width = b.dataset.w + "%"; });
+  }));
+}
+
+function buildTaxDetail(t, cd) {
+  document.getElementById("txd-cntry").textContent = cd.name;
+  document.getElementById("txd-rows").innerHTML = `
+    <div class="txdr"><span>Salario bruto mensual</span><span>${fmt(t.grossMonthly, cd.symbol)}</span></div>
+    <div class="txdr neg"><span>IRPF / Impuesto renta (tipo ef. ${t.irpfPct}%)</span><span>- ${fmt(t.irpfMonthly, cd.symbol)}</span></div>
+    <div class="txdr neg"><span>Seg. Social / Aportes (${t.ssPct}%)</span><span>- ${fmt(t.ssMonthly, cd.symbol)}</span></div>
+    <div class="txdr neg" style="font-size:.82rem;font-weight:700"><span>Total retenciones (${t.totalPct}% del bruto)</span><span>- ${fmt(t.totalMonthly, cd.symbol)}</span></div>`;
+  document.getElementById("txd-neto").textContent = fmt(t.netoMonthly, cd.symbol);
+  document.getElementById("txd-note").textContent = cd.taxNote;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SHOW DASHBOARD
+══════════════════════════════════════════════════════════ */
+function showDash() {
+  const gross = parseFloat(document.getElementById("inc-input").value) || 0;
+  const costCd = rData || oData;  // costes del país de residencia
+  const t = calcTax(gross, oData);
+  const dist = getDist(t.netoMonthly, costCd);
+  const sym = oData.symbol;
+  const cross = rData && oData.currency !== rData.currency;
+
+  // Nav subtitle
+  document.getElementById("dash-sub").textContent =
+    cross ? `${oData.name} → ${rData.name}` : oData.name;
+
+  // Status banner
+  const ratio = oData.minWage > 0 ? gross / oData.minWage : 0;
+  const color = ratio < 0.9 ? "#f87171" : ratio < 1.5 ? "#fbbf24" : "#34d399";
+  const emoji = ratio < 0.9 ? "⚠️" : ratio < 1.5 ? "📊" : "🚀";
+  const title = ratio < 0.9
+    ? `Tu bruto está por debajo del salario mínimo en ${oData.name}`
+    : ratio < 1.5 ? "Tu salario está cerca del salario mínimo"
+    : `Tu salario es ${(Math.round(ratio*10)/10)}x el mínimo de ${oData.name}`;
+  const subText = `Bruto: ${fmt(gross, sym)} · Retenciones: ${fmt(t.totalMonthly, sym)} (${t.totalPct}%) · Neto: ${fmt(t.netoMonthly, sym)}`;
+
+  const banner = document.getElementById("s-banner");
+  banner.style.borderLeftColor = color;
+  document.getElementById("s-em").textContent = emoji;
+  document.getElementById("s-title").textContent = title;
+  document.getElementById("s-sub").textContent = subText;
+  const rv = document.getElementById("s-ratio");
+  rv.textContent = ratio > 0 ? `${(Math.round(ratio*10)/10)}x` : "—";
+  rv.style.color = color;
+
+  // Tax bar
+  document.getElementById("tx-bruto").textContent  = fmt(gross, sym);
+  document.getElementById("tx-imp").textContent    = `- ${fmt(t.totalMonthly, sym)}`;
+  document.getElementById("tx-neto").textContent   = fmt(t.netoMonthly, sym);
+  document.getElementById("tx-annual").textContent = fmt(t.netoMonthly * 12, sym);
+
+  buildTaxDetail(t, oData);
+
+  // Summary aside
+  document.getElementById("sum-bruto").textContent = fmt(gross, sym);
+  document.getElementById("sum-neto").textContent  = fmt(t.netoMonthly, sym);
+  const netoUSD = t.netoMonthly * (USD_RATES[oData.currency] || 1);
+  document.getElementById("sum-usd").textContent   = `$${Math.round(netoUSD).toLocaleString()}`;
+
+  if (cross && rData) {
+    const inRes = netoUSD / (USD_RATES[rData.currency] || 1);
+    document.getElementById("cross-lbl").textContent  = `Neto en ${rData.currency}`;
+    document.getElementById("sum-cross").textContent  = fmt(Math.round(inRes), rData.symbol);
+    document.getElementById("cross-item").style.display = "block";
+    document.getElementById("cross-div").style.display  = "block";
+  } else {
+    document.getElementById("cross-item").style.display = "none";
+    document.getElementById("cross-div").style.display  = "none";
+  }
+
+  // Savings
+  const sav = dist.find(d => d.key === "ahorro");
+  const savPct = t.netoMonthly > 0 && sav.value > 0 ? Math.round(sav.value / t.netoMonthly * 100) : 0;
+  document.getElementById("sav-val").textContent  = fmt(sav.value, sym);
+  document.getElementById("sav-pct").textContent  =
+    sav.value > 0 ? `${savPct}% del neto · ${fmt(sav.value * 12, sym)}/año` : "Los gastos básicos superan el neto";
+  document.getElementById("sav-annual").textContent =
+    sav.value > 0 ? `En 10 años (sin intereses): ${fmt(sav.value * 120, sym)}` : "Considera reducir gastos o aumentar ingresos";
+
+  // Tip
+  document.getElementById("tip-em").textContent = ratio < 1 ? "⚠️" : ratio < 2 ? "📌" : "🏆";
+  document.getElementById("tip-t").textContent  = ratio < 1 ? "Prioriza lo esencial" : ratio < 2 ? "Gestiona bien tu neto" : "Optimiza tu patrimonio";
+  document.getElementById("tip-x").textContent  =
+    ratio < 1
+      ? `Tu ingreso bruto es inferior al mínimo en ${oData.name}. Tras impuestos y SS quedan ${fmt(t.netoMonthly, sym)} netos. Céntrate en gastos básicos primero.`
+      : ratio < 2
+        ? `Con ${fmt(t.netoMonthly, sym)} netos en ${costCd.name}, los gastos fijos representan buena parte del presupuesto. Automatiza el ahorro justo tras el cobro.`
+        : `Buen nivel de ingresos en ${oData.name}. Tipo efectivo de ${t.irpfPct}% en IRPF. Considera maximizar planes de pensiones o fondos indexados.`;
+
+  document.getElementById("chart-sub").textContent =
+    `Costes medios reales en ${costCd.name} — el resto es tu capacidad de ahorro`;
+  document.getElementById("bars-sub").textContent =
+    `Importes medios habituales en ${costCd.name}. Variará según ciudad y estilo de vida.`;
+
+  // Build chart + legend + bars
+  buildChart(dist);
+  buildLegend(dist);
+  buildBars(dist, t.netoMonthly);
+
+  // Tips section
+  const usedCosts = dist.filter(d => d.key !== "ahorro").reduce((a, b) => a + b.value, 0);
+  document.getElementById("tips").innerHTML = [
+    {
+      emoji:"📐", title:"Ahorra antes de gastar",
+      text:`En ${costCd.name} los gastos fijos habituales son ≈ ${fmt(usedCosts, sym)}/mes. Con tu neto de ${fmt(t.netoMonthly, sym)} te sobran ${fmt(Math.max(0, t.netoMonthly - usedCosts), sym)}. Transfiérelos a una cuenta de ahorro el día de cobro.`
+    },
+    {
+      emoji:"🧾", title:"Tu tipo efectivo real",
+      text:`Pagas ${fmt(t.totalMonthly, sym)}/mes en impuestos y SS (${t.totalPct}% del bruto). El IRPF al ser progresivo tiene tipo efectivo de ${t.irpfPct}%, mucho menor que el tipo marginal del último tramo.`
+    },
+    {
+      emoji:"🏠", title:"Vivienda: la regla del 30%",
+      text:`En ${costCd.name} el alquiler medio ronda ${fmt(costCd.costs.vivienda, sym)}/mes. La regla financiera dice que no debe superar el 30% del neto. Tu 30% es ${fmt(t.netoMonthly * 0.30, sym)}.`
+    },
+  ].map(tip => `
+    <div class="card tipc">
+      <div class="tipem">${tip.emoji}</div>
+      <div class="tipt">${tip.title}</div>
+      <div class="tipx">${tip.text}</div>
+    </div>`).join("");
+
+  // Switch steps
+  document.getElementById("s1").style.display = "none";
+  const dash = document.getElementById("s2");
+  dash.classList.add("vis");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ═══════════════════════════════════════════════════════
+   EVENTS
+══════════════════════════════════════════════════════════ */
+document.getElementById("sel-origin").addEventListener("change", onOrigin);
+document.getElementById("sel-res").addEventListener("change", onRes);
+document.getElementById("inc-input").addEventListener("input", () => {
+  refreshTaxLive(); refreshConvNote(); refreshBtn();
+});
+document.getElementById("go").addEventListener("click", showDash);
+document.getElementById("btn-back").addEventListener("click", () => {
+  document.getElementById("s1").style.display = "block";
+  const d = document.getElementById("s2");
+  d.classList.remove("vis");
+  d.style.display = "none";
+  setTimeout(() => { d.style.display = ""; }, 20);
+});
+document.getElementById("tog").addEventListener("click", () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  html.setAttribute("data-theme", isDark ? "light" : "dark");
+  document.getElementById("tog").textContent = isDark ? "🌙" : "☀️";
+  // Rebuild chart for new theme border colors
+  if (document.getElementById("s2").classList.contains("vis") && oData) {
+    const gross = parseFloat(document.getElementById("inc-input").value) || 0;
+    const costCd = rData || oData;
+    const t = calcTax(gross, oData);
+    buildChart(getDist(t.netoMonthly, costCd));
+  }
+});
+
+populateSelects();
+</script>
+</body>
+</html>
